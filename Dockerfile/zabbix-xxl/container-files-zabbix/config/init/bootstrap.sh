@@ -136,6 +136,30 @@ if [ -f /etc/custom-config/zabbix_server.conf ]; then
   if [ ! -z "$FZS_DBName" ]; then
     export ZS_DBName=$FZS_DBName
   fi
+  FZS_CacheSize=$(grep ^CacheSize= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_CacheSize" ]; then
+    export ZS_CacheSize=$FZS_CacheSize
+  fi
+  FZS_StartPollersUnreachable=$(grep ^StartPollersUnreachable= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_StartPollersUnreachable" ]; then
+    export ZS_StartPollersUnreachable=$FZS_StartPollersUnreachable
+  fi
+  FZS_StartPingers=$(grep ^StartPingers= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_StartPingers" ]; then
+    export ZS_StartPingers=$FZS_StartPingers
+  fi
+  FZS_StartPollers=$(grep ^StartPollers= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_StartPollers" ]; then
+    export ZS_StartPollers=$FZS_StartPollers
+  fi
+  FZS_ValueCacheSize=$(grep ^ValueCacheSize= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_ValueCacheSize" ]; then
+    export ZS_ValueCacheSize=$FZS_ValueCacheSize
+  fi
+  FZS_SSHKeyLocation=$(grep ^SSHKeyLocation= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_SSHKeyLocation" ]; then
+    export ZS_SSHKeyLocation=$FZS_SSHKeyLocation
+  fi
 fi
 log "Preparing server configuration"
 update_config

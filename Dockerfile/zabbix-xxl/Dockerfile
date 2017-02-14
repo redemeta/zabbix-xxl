@@ -33,6 +33,12 @@ ENV \
   ZS_SSLCertLocation=/usr/local/share/zabbix/ssl/certs \
   ZS_SSLKeyLocation=/usr/local/share/zabbix/ssl/keys \
   ZS_LoadModulePath=/usr/lib/zabbix/modules \
+  ZS_CacheSize=2G \
+  ZS_ValueCacheSize=128M \
+  ZS_StartPingers=10 \
+  ZS_StartPollersUnreachable=35 \
+  ZS_StartPollers=100 \
+  ZS_SSHKeyLocation="/home/zabbix/.ssh" \
   ZW_ZBX_SERVER=localhost \
   ZW_ZBX_SERVER_PORT=10051 \
   ZW_ZBX_SERVER_NAME="Zabbix Server" \
@@ -173,24 +179,30 @@ RUN \
   pip install pyzabbix && \
   yum autoremove -y ipa-pgothic-fonts python-pip && \
   yum clean all && \
+  groupadd zabbix && \
+  useradd -g zabbix zabbix && \
+  usermod -m -d /home/zabbix zabbix && \
+  mkdir -p /home/zabbix/.ssh && \
+  chown -R zabbix:zabbix /home/zabbix && \
+  chmod 700 /home/zabbix && \
   ### branding / menu ### && \
   sed -i "s/ZABBIX_VERSION.*'\(.*\)'/ZABBIX_VERSION', '\1 XXL'/g" /usr/local/src/zabbix/frontends/php/include/defines.inc.php && \
   grep 'XXL' /usr/local/src/zabbix/frontends/php/include/defines.inc.php && \
-  sed -i "s#]))->addClass(ZBX_STYLE_FOOTER);#,' / ',(new CLink('Monitoring Artist Ltd', 'http://www.monitoringartist.com'))->addClass(ZBX_STYLE_GREY)->addClass(ZBX_STYLE_LINK_ALT)->setAttribute('target', '_blank'),]))->addClass(ZBX_STYLE_FOOTER);#g" /usr/local/src/zabbix/frontends/php/include/html.inc.php && \
-  grep 'www.monitoringartist.com' /usr/local/src/zabbix/frontends/php/include/html.inc.php && \
-  sed -i "s/(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),/(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),(new CDiv())->addClass(ZBX_STYLE_CENTER)->addItem((new CTag('h1', true, _('Zabbix XXL')))->addClass(ZBX_STYLE_BLUE))->addItem((new CLink(_('Maintained by Monitoring Artist'), 'http:\/\/www.monitoringartist.com'))->setTarget('_blank')->addClass(ZBX_STYLE_GREY)),/g" /usr/local/src/zabbix/frontends/php/include/views/general.login.php && \
-  grep 'www.monitoringartist.com' /usr/local/src/zabbix/frontends/php/include/views/general.login.php && \
-  sed -i "s#echo '</body></html>';#echo \"<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-72810204-2','auto');ga('send','pageview');</script></body></html>\";#g" /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
-  grep 'UA-72810204-2' /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
-  sed -i "s#echo '</body></html>';#echo \"<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-72810204-2','auto');ga('send','pageview');</script></body></html>\";#g" /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
-  grep 'UA-72810204-2' /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
+  sed -i "s#]))->addClass(ZBX_STYLE_FOOTER);#,' / ',(new CLink('META Telecom S.A.', 'http://www.redemeta.com.br'))->addClass(ZBX_STYLE_GREY)->addClass(ZBX_STYLE_LINK_ALT)->setAttribute('target', '_blank'),]))->addClass(ZBX_STYLE_FOOTER);#g" /usr/local/src/zabbix/frontends/php/include/html.inc.php && \
+  grep 'www.redemeta.com.br' /usr/local/src/zabbix/frontends/php/include/html.inc.php && \
+  sed -i "s/(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),/(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),(new CDiv())->addClass(ZBX_STYLE_CENTER)->addItem((new CTag('h1', true, _('Zabbix Meta Telecom')))->addClass(ZBX_STYLE_BLUE))->addItem((new CLink(_('Maintained by Meta Telecom S.A.'), 'http:\/\/www.redemeta.com.br'))->setTarget('_blank')->addClass(ZBX_STYLE_GREY)),/g" /usr/local/src/zabbix/frontends/php/include/views/general.login.php && \
+  grep 'www.redemeta.com.br' /usr/local/src/zabbix/frontends/php/include/views/general.login.php && \
+  #sed -i "s#echo '</body></html>';#echo \"<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-72810204-2','auto');ga('send','pageview');</script></body></html>\";#g" /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
+  #grep 'UA-72810204-2' /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
+  #sed -i "s#echo '</body></html>';#echo \"<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-72810204-2','auto');ga('send','pageview');</script></body></html>\";#g" /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
+  #grep 'UA-72810204-2' /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
   ZVERSION=$(zabbix_agentd -V | grep ^zabbix_agentd | awk -F'\\(Zabbix\\) ' '{print $2}') && \
   sed -i "s#^var xxlCurrentVersion =.*#var xxlCurrentVersion = \"$ZVERSION\";#" /usr/local/src/zabbix/frontends/php/updatechecker/updatechecker.js && \
   grep "$ZVERSION" /usr/local/src/zabbix/frontends/php/updatechecker/updatechecker.js && \
-  sed -i "s#.*</body></html>.*#echo \"<script type='text/javascript' src='updatechecker/updatechecker.js'></script>\";\n&#" /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
-  grep 'updatechecker.js' /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
-  sed -i "s#</body></html>#<script type='text/javascript' src='updatechecker/updatechecker.js'></script></body></html>#g" /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
-  grep 'updatechecker.js' /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
+  #sed -i "s#.*</body></html>.*#echo \"<script type='text/javascript' src='updatechecker/updatechecker.js'></script>\";\n&#" /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
+ # grep 'updatechecker.js' /usr/local/src/zabbix/frontends/php/include/page_footer.php && \
+ # sed -i "s#</body></html>#<script type='text/javascript' src='updatechecker/updatechecker.js'></script></body></html>#g" /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
+ # grep 'updatechecker.js' /usr/local/src/zabbix/frontends/php/app/views/layout.htmlpage.php && \
   sed -i "s#'login' => \[#'xxl' => \n[\n'label' => _('XXL extensions'),\n'user_type' => USER_TYPE_SUPER_ADMIN,\n'default_page_id' => 0,\n'pages' => [\n['url' => 'searcher.php','label' => _('Searcher'),],\n['url' => 'zapix.php','label' => _('Zapix'),],\n['url' => 'grapher.php','label' => _('Grapher'),],\n['url' => 'about.php','label' => _('About'),]\n]],\n'login' => [#g" /usr/local/src/zabbix/frontends/php/include/menu.inc.php && \
   grep 'XXL extensions' /usr/local/src/zabbix/frontends/php/include/menu.inc.php && \
   sed -i "s#'admin': 0},# 'admin': 0, 'xxl': 0},#g" /usr/local/src/zabbix/frontends/php/js/main.js && \
@@ -205,4 +217,4 @@ CMD ["/config/bootstrap.sh"]
 
 VOLUME ["/etc/custom-config", "/usr/local/share/zabbix/alertscripts", "/usr/local/share/zabbix/externalscripts", "/usr/local/share/zabbix/ssl/certs", "/usr/local/share/zabbix/ssl/keys", "/usr/lib/zabbix/modules", "/usr/share/snmp/mibs", "/etc/snmp"]
 
-EXPOSE 80/TCP 162/UDP 10051/TCP 10052/TCP
+EXPOSE 80/TCP 443/TCP 162/UDP 10051/TCP 10052/TCP
