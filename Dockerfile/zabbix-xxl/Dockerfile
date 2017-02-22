@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM centos:centos7.0.1406
 MAINTAINER Jan Garaj info@monitoringartist.com
 
 # ZABBIX_VERSION=trunk tags/3.0.1 branches/dev/ZBXNEXT-1263-1
@@ -35,9 +35,10 @@ ENV \
   ZS_LoadModulePath=/usr/lib/zabbix/modules \
   ZS_CacheSize=2G \
   ZS_ValueCacheSize=128M \
-  ZS_StartPingers=10 \
-  ZS_StartPollersUnreachable=35 \
-  ZS_StartPollers=100 \
+  ZS_StartPingers=20 \
+  ZS_StartPollersUnreachable=60 \
+  ZS_StartPollers=200 \
+  ZS_StartDiscoverers=10 \
   ZS_SSHKeyLocation="/home/zabbix/.ssh" \
   ZW_ZBX_SERVER=localhost \
   ZW_ZBX_SERVER_PORT=10051 \
@@ -104,9 +105,10 @@ COPY container-files-zabbix /
 RUN \
   yum clean all && \
   yum update -y && \
+  mv /etc/yum/protected.d/systemd.conf /etc/yum/protected.d/systemd.conf.bak && \
   yum install -y tar svn gcc automake make nmap traceroute iptstate wget \
               net-snmp-devel net-snmp-libs net-snmp net-snmp-perl iksemel \
-              net-snmp-python net-snmp-utils java-1.8.0-openjdk \
+              net-snmp-python net-snmp-utils java-1.8.0-openjdk libevent-devel \
               java-1.8.0-openjdk-devel mariadb-devel libxml2-devel gettext \
               libcurl-devel OpenIPMI-devel mysql iksemel-devel libssh2-devel \
               unixODBC unixODBC-devel mysql-connector-odbc postgresql-odbc \

@@ -160,6 +160,10 @@ if [ -f /etc/custom-config/zabbix_server.conf ]; then
   if [ ! -z "$FZS_SSHKeyLocation" ]; then
     export ZS_SSHKeyLocation=$FZS_SSHKeyLocation
   fi
+  FZS_StartDiscoverers=$(grep ^StartDiscoverers= /etc/custom-config/zabbix_server.conf | awk -F= '{print $2}')
+  if [ ! -z "$FZS_StartDiscoverers" ]; then
+    export ZS_StartDiscoverers=$FZS_StartDiscoverers
+  fi
 fi
 log "Preparing server configuration"
 update_config
